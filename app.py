@@ -48,13 +48,12 @@ def recalcular(dados, user, mes):
     dados["usuarios"][user]["meses"][mes]["entradas"] = entradas
     dados["usuarios"][user]["meses"][mes]["saidas"] = saidas
 
-# ---------- INICIO ----------
+# ---------- APP ----------
 dados = carregar()
 
 st.set_page_config(page_title="Banco 💚", layout="centered")
 st.title("Banco 💚")
 
-# usuário e mês
 user = st.text_input("Usuário")
 mes = st.text_input("Mês")
 
@@ -75,8 +74,9 @@ if user and mes:
 
     info = dados["usuarios"][user]["meses"][mes]
 
-    # ---------- RESUMO ----------
     recalcular(dados, user, mes)
+
+    # ---------- RESUMO ----------
     st.subheader("Resumo")
     st.metric("Saldo", f"R$ {info['saldo']:.2f}")
     st.write(f"Entradas: R$ {info['entradas']:.2f}")
@@ -96,12 +96,14 @@ if user and mes:
         texto = f"+ {data_atual()} | {nome} ({categoria}): {v:.2f}"
         info["historico"].append(texto)
         salvar(dados)
+        st.rerun()
 
     if col2.button("Gasto 💸"):
         v = ler_valor(valor)
         texto = f"- {data_atual()} | {nome} ({categoria}): {v:.2f}"
         info["historico"].append(texto)
         salvar(dados)
+        st.rerun()
 
     # ---------- HISTÓRICO ----------
     st.subheader("Histórico")
@@ -111,7 +113,7 @@ if user and mes:
     # ---------- EDITAR ----------
     st.subheader("Editar")
 
-    idx = st.number_input("Índice para editar", min_value=0, step=1)
+    idx = st.number_input("Índice", min_value=0, step=1)
     novo_nome = st.text_input("Novo nome")
     novo_valor = st.text_input("Novo valor")
 
@@ -121,6 +123,7 @@ if user and mes:
             v = ler_valor(novo_valor)
             info["historico"][idx] = f"{tipo} {data_atual()} | {novo_nome}: {v:.2f}"
             salvar(dados)
+            st.rerun()
 
     # ---------- REMOVER ----------
     st.subheader("Remover")
@@ -131,6 +134,7 @@ if user and mes:
         if idx_remove < len(info["historico"]):
             info["historico"].pop(idx_remove)
             salvar(dados)
+            st.rerun()
 
     # ---------- FILTRO ----------
     st.subheader("Filtro")
@@ -155,5 +159,3 @@ if user and mes:
                 st.write(f"{m}: R$ {saldo:.2f}")
             else:
                 st.write(f"{m}: sem dados")
-
-    salvar(dados
